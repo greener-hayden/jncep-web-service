@@ -2,6 +2,11 @@
 
 This Flask-based application opens the JNCEP utility up to simple HTTP requests. It can easily be spun up using Docker Compose.
 
+## Credits
+
+This project builds upon the work of JNCEP created by [gvellut](https://github.com/gvellut). The original repository can be found at [gvellut/jncep](https://github.com/gvellut/jncep). I'm thankful to gvellut since i've been using his code for maybe close to a year now. And i've only recent gotten around to swapping my own personal over to this system.
+
+
 ## Quickstart
 
 To get started, ensure you have Docker and Docker Compose installed on your system, then follow these steps:
