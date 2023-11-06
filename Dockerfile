@@ -1,7 +1,7 @@
-FROM python:slim
+FROM python:3.11-slim
 WORKDIR /app
-RUN pip install Flask gunicorn jncep requests
 COPY . /app
+RUN pip install -r requirements.txt
 ENV JNCEP_OUTPUT_DIR /app/downloads
 RUN mkdir -p ${JNCEP_OUTPUT_DIR}
 EXPOSE 5000
