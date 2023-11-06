@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  jncep-service:
+    build: .
+    container_name: jncep-container
+    ports:
+      - "5000:5000"
+    volumes:
+      - D:\GitLocal\jncep\downloads:/app/downloads
+      - D:\GitLocal\jncep\:/root/.config/jncep
+    environment:
+      - JNCEP_EMAIL=XXXXX
+      - JNCEP_PASSWORD=XXXXX
+      - DISCORD_WEBHOOK_URL=XXXXXX
