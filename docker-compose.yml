@@ -7,8 +7,8 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - /path/to/downloads:/app/downloads
-      - /path/to/store/config:/root/.config/jncep
+      - CHANGE_ME/downloads:/app/downloads
+      - CHANGE_ME/config:/root/.config/jncep
     environment:
       - JNCEP_EMAIL=EMAIL_HERE
       - JNCEP_PASSWORD=PASSWORD_HERE
