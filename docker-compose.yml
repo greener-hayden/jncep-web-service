@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   jncep-service:
-    build: .
+    image: ghcr.io/itslightmind/jncep-web-service:latest
     container_name: jncep-container
     ports:
       - "5000:5000"
