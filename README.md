@@ -4,7 +4,7 @@ This Flask-based application opens the JNCEP utility up to simple HTTP requests.
 
 ## Credits
 
-This project builds upon the work of JNCEP created by [gvellut](https://github.com/gvellut). The original repository can be found at [gvellut/jncep](https://github.com/gvellut/jncep). I'm thankful to gvellut since i've been using his code for maybe close to a year now. And i've only recent gotten around to swapping my own personal over to this system.
+This project builds upon the work of JNCEP created by [gvellut](https://github.com/gvellut). The original repository can be found at [gvellut/jncep](https://github.com/gvellut/jncep). I'm thankful to gvellut since i've been using his code for maybe close to a year now. And i've only recent gotten around to swapping my own personal over to this system. This interface is also completely unaffiliated with J-Novel Club and is just a personal and or community project.
 
 
 ## Quickstart
