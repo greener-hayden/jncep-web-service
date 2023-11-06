@@ -1,17 +1,25 @@
 name: Docker Image CI for GHCR
 
-
 on:
-  push
+  push:
 
+jobs:
+  build_and_publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
 
-  jobs:
-    build_and_publish:
-      runs-on: ubuntu-latest
-      steps:
-        - uses:actions/checkout@v3
-        - name: Build and push the image
-          run: |
-            docker login --username itslightmind --pasword ${{ secrets.GH_PAT  }} ghcr.io
-            docker build . --tag ghcr.io/itslightmind/jncep-web-service:latest
-            docker push ghcr.io/itslightmind/jncep-web-service:latest
+      - name: Log in to GitHub Container Registry
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          echo $GH_PAT | docker login ghcr.io --username itslightmind --password-stdin
+
+      - name: Build and push the image
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          docker build . --file Dockerfile --tag ghcr.io/itslightmind/jncep-web-service:latest --tag ghcr.io/itslightmind/jncep-web-service:$GITHUB_SHA
+          docker push ghcr.io/itslightmind/jncep-web-service:latest
+          docker push ghcr.io/itslightmind/jncep-web-service:$GITHUB_SHA
