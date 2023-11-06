@@ -7,9 +7,10 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - D:\GitLocal\jncep\downloads:/app/downloads
-      - D:\GitLocal\jncep\:/root/.config/jncep
+      - /path/to/downloads:/app/downloads
+      - /path/to/store/config:/root/.config/jncep
     environment:
-      - JNCEP_EMAIL=XXXXX
-      - JNCEP_PASSWORD=XXXXX
-      - DISCORD_WEBHOOK_URL=XXXXXX
+      - JNCEP_EMAIL=EMAIL_HERE
+      - JNCEP_PASSWORD=PASSWORD_HERE
+      # Optionally, uncomment the next line if you have a Discord webhook URL, dont wrap quotes around it.
+      # - DISCORD_WEBHOOK_URL=
