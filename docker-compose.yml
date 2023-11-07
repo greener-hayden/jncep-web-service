@@ -14,3 +14,15 @@ services:
       - JNCEP_PASSWORD=PASSWORD_HERE
       # Optionally, uncomment the next line if you have a Discord webhook URL, dont wrap quotes around it.
       # - DISCORD_WEBHOOK_URL=
+
+  cron-service:
+    image: willfarrell/crontab
+    depends_on:
+      - jncep-service
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DOCKER_LABELS=TRUE
+    labels:
+      - cron.sync_job.schedule=0,20,40 * * * *
+      - cron.sync_job.command=curl -s http://jncep-service:5000/sync
