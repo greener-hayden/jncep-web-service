@@ -15,15 +15,16 @@ services:
       # Optionally, uncomment the next line if you have a Discord webhook URL, dont wrap quotes around it.
       # - DISCORD_WEBHOOK_URL=
 
+  # Set up the cron job with the desired frequency
+  # Use "*/20 * * * *" for every 20 minutes
+  # Use "0 * * * *" for hourly
+  # Use "0 */2 * * *" for every 2 hours
+  # Use "0 */30 * * *" for every 30 minutes
   cron:
     image: alpine:latest
-    environment:
-      - CRON_FREQUENCY=*/20 * * * * # Every 20 minutes
-      # You can change the above line to "0 * * * *" for every hour
-      # or "*/30 * * * *" for every 30 minutes, etc.
     entrypoint: /bin/sh -c
     command: |
-      apk add --no-cache curl &&
-      (echo "$CRON_FREQUENCY /usr/bin/curl -s http://jncep-service:5000/sync" > /etc/crontabs/root) &&
+      "apk add --no-cache curl &&
+      (echo '*/20 * * * * /usr/bin/curl -s http://jncep-service:5000/sync' > /etc/crontabs/root) &&
       crond -l 2 -f &&
-      tail -f /dev/null
+      tail -f /dev/null"
