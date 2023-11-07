@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template, send_from_directory, abort
 import os
 import subprocess
 import requests
@@ -114,7 +114,32 @@ def update_epubs():
                              "EPUBs Updated",
                              "Update Failed")
 
+
 check_environment_variables()
+# Path to the downloads directory
+downloads_dir = os.getenv('JNCEP_OUTPUT_DIR', '/app/downloads')
+
+# Ensure the directory exists
+os.makedirs(downloads_dir, exist_ok=True)
+
+@app.route('/')
+def index():
+    try:
+        # List files in the downloads directory
+        files = os.listdir(downloads_dir)
+    except OSError as e:
+        return f"Error accessing the downloads directory: {e}", 500
+    
+    # Render the template with the list of files
+    return render_template('index.html', files=files)
+
+@app.route('/download/<path:filename>')
+def download(filename):
+    try:
+        # Send file for download
+        return send_from_directory(downloads_dir, filename, as_attachment=True)
+    except FileNotFoundError:
+        abort(404)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

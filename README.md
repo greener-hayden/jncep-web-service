@@ -59,3 +59,9 @@ curl http://localhost:5000/list
 ```bash
 curl http://localhost:5000/track
 ```
+
+### Visit to download the epubs
+
+```bash
+http://localhost:5000/
+```
