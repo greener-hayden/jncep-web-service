@@ -52,10 +52,17 @@
 <body class="bg-gray-100">
     <section class="container mx-auto p-6">
         <h1 class="text-2xl font-bold mb-4">File List</h1>
-        <form action="/" method="get" class="mb-4">
-            <input type="text" name="search" placeholder="Search files..." value="{{ query }}" class="border p-2 rounded-lg">
-            <button type="submit" class="border p-2 rounded-lg bg-blue-500 text-white">Search</button>
-        </form>
+        <div class="flex justify-start mb-4">
+            <!-- Search and Sync Form -->
+            <form action="/" method="get" class="flex">
+                <input type="text" name="search" placeholder="Search files..." value="{{ query }}" class="border p-2 rounded-l-lg">
+                <button type="submit" class="border-y border-r p-2 rounded-r-lg bg-blue-500 text-white">Search</button>
+            </form>
+            <!-- Sync Button Form -->
+            <form action="/sync" method="get" class="ml-2">
+                <button type="submit" class="border p-2 rounded-lg bg-blue-500 text-white">Force Sync</button>
+            </form>
+        </div>
         <ul class="space-y-2">
             {% for file in files %}
             <li class="border rounded-lg p-4 flex justify-between items-center">
