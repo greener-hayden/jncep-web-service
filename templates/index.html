@@ -4,17 +4,68 @@
     <meta charset="UTF-8">
     <title>Download List</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script>
+        // Function to calculate relative time
+        function timeSince(date) {
+            var seconds = Math.floor((new Date() - date) / 1000);
+            var interval = seconds / 31536000;
+
+            if (interval > 1) {
+                return Math.floor(interval) + " years";
+            }
+            interval = seconds / 2592000;
+            if (interval > 1) {
+                return Math.floor(interval) + " months";
+            }
+            interval = seconds / 86400;
+            if (interval > 1) {
+                return Math.floor(interval) + " days";
+            }
+            interval = seconds / 3600;
+            if (interval > 1) {
+                return Math.floor(interval) + " hours";
+            }
+            interval = seconds / 60;
+            if (interval > 1) {
+                return Math.floor(interval) + " minutes";
+            }
+            return Math.floor(seconds) + " seconds";
+        }
+
+        // Update all timestamps on the page
+        function updateTimestamps() {
+            var timestamps = document.getElementsByClassName('timestamp');
+            for (var i = 0; i < timestamps.length; i++) {
+                var ts = timestamps[i];
+                var date = new Date(ts.getAttribute('data-timestamp') * 1000);
+                ts.textContent = timeSince(date) + ' ago';
+            }
+        }
+
+        // When the document is fully loaded, update timestamps
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTimestamps(); // Initial update
+            setInterval(updateTimestamps, 60000); // Update every minute
+        });
+    </script>
 </head>
 <body class="bg-gray-100">
     <section class="container mx-auto p-6">
         <h1 class="text-2xl font-bold mb-4">File List</h1>
+        <form action="/" method="get" class="mb-4">
+            <input type="text" name="search" placeholder="Search files..." value="{{ query }}" class="border p-2 rounded-lg">
+            <button type="submit" class="border p-2 rounded-lg bg-blue-500 text-white">Search</button>
+        </form>
         <ul class="space-y-2">
             {% for file in files %}
-            <li class="border rounded-lg p-4 flex items-center justify-between">
-                <span>{{ file }}</span>
-                <a href="{{ url_for('download', filename=file) }}" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
-                    Download
-                </a>
+            <li class="border rounded-lg p-4 flex justify-between items-center">
+                <span>{{ file.display_name }}</span>
+                <div class="flex items-center">
+                    <span class="timestamp text-gray-500 text-sm" data-timestamp="{{ file.timestamp }}"></span>
+                    <a href="{{ url_for('download', filename=file.full_name) }}" class="ml-4 inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+                        Download
+                    </a>
+                </div>
             </li>
             {% endfor %}
         </ul>

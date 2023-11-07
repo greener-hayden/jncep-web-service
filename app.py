@@ -4,6 +4,8 @@ import subprocess
 import requests
 import re
 import sys
+from datetime import datetime
+import time
 
 app = Flask(__name__)
 
@@ -36,20 +38,22 @@ def send_discord_notification(title, description):
         except requests.RequestException as e:
             print(f"Discord notification failed: {e}")
 
-def truncate(text, max_length=32):
+def truncate(text, max_length=64):
     """
     Truncates the provided text to the specified max_length at the nearest
     preferred breakpoint without splitting words, appending ellipsis if needed.
     """
+    text = os.path.splitext(text)[0].replace('_', ' ')
+    
     if len(text) <= max_length:
         return text
-    
+
     breakpoints = ('.', ',', ';', ' ')
     for bp in breakpoints:
         idx = text.rfind(bp, 0, max_length)
         if idx != -1:
             return text[:idx] + '...'
-    
+
     idx = text.rfind(' ', 0, max_length)
     return text[:idx] if idx != -1 else text[:max_length-3] + '...'
 
@@ -124,14 +128,25 @@ os.makedirs(downloads_dir, exist_ok=True)
 
 @app.route('/')
 def index():
+    query = request.args.get('search', '')
+    search_query = query.lower().replace(' ', '_')  # Use underscores internally for matching filenames
     try:
         # List files in the downloads directory
         files = os.listdir(downloads_dir)
+        # Process files for display
+        processed_files = [
+            {
+                'display_name': truncate(f.replace('_', ' ')),  # Replace underscores for display
+                'full_name': f,  # Keep the actual file name for download links
+                'timestamp': os.path.getctime(os.path.join(downloads_dir, f))  # File creation time as Unix timestamp
+            }
+            for f in files if search_query in f.lower()  # Use the modified search_query for matching
+        ]
     except OSError as e:
         return f"Error accessing the downloads directory: {e}", 500
-    
-    # Render the template with the list of files
-    return render_template('index.html', files=files)
+
+    # Render the template with the list of files and the original search query
+    return render_template('index.html', files=processed_files, query=query)
 
 @app.route('/download/<path:filename>')
 def download(filename):
@@ -140,6 +155,8 @@ def download(filename):
         return send_from_directory(downloads_dir, filename, as_attachment=True)
     except FileNotFoundError:
         abort(404)
+
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
