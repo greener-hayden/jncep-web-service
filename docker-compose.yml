@@ -15,7 +15,7 @@ services:
       # Optionally, uncomment the next line if you have a Discord webhook URL, dont wrap quotes around it.
       # - DISCORD_WEBHOOK_URL=
 
-  cron-service:
+  cron-service: # this automates the syncing of tracked series
     image: willfarrell/crontab
     depends_on:
       - jncep-service
@@ -24,5 +24,5 @@ services:
     environment:
       - DOCKER_LABELS=TRUE
     labels:
-      - cron.sync_job.schedule=0,20,40 * * * *
+      - cron.sync_job.schedule=0,20,40 * * * * # by default this runs every 20 minutes on the hour, to change this you just have to search a cron calculator
       - cron.sync_job.command=curl -s http://jncep-service:5000/sync
