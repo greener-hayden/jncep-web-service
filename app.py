@@ -37,25 +37,44 @@ def send_discord_notification(title, description):
             response.raise_for_status()
         except requests.RequestException as e:
             print(f"Discord notification failed: {e}")
-
+            
 def truncate(text, max_length=64):
     """
     Truncates the provided text to the specified max_length at the nearest
     preferred breakpoint without splitting words, appending ellipsis if needed.
+    This version also handles filenames by truncating the series name part
+    before "_Volume" and retains the volume and part information.
     """
-    text = os.path.splitext(text)[0].replace('_', ' ')
+    # Separate the base name and extension
+    base_name, extension = os.path.splitext(text)
+    # Find the position of "_Volume" in the base name
+    volume_index = base_name.find('_Volume')
     
-    if len(text) <= max_length:
-        return text
+    # If "_Volume" is not found or the series name is short enough, return the base name with underscores replaced
+    if volume_index == -1 or volume_index <= max_length:
+        return base_name.replace('_', ' ') + extension
 
-    breakpoints = ('.', ',', ';', ' ')
-    for bp in breakpoints:
-        idx = text.rfind(bp, 0, max_length)
+    # Extract the series name part before "_Volume"
+    series_name = base_name[:volume_index]
+    # Replace underscores with spaces for the series name
+    series_name = series_name.replace('_', ' ')
+
+    # Truncate the series name if it's longer than the max_length
+    if len(series_name) > max_length:
+        breakpoints = ('.', ',', ';', ' ')
+        for bp in breakpoints:
+            idx = series_name.rfind(bp, 0, max_length)
+            if idx != -1:
+                return series_name[:idx] + '...' + base_name[volume_index:].replace('_', ' ') + extension
+        
+        idx = series_name.rfind(' ', 0, max_length)
         if idx != -1:
-            return text[:idx] + '...'
+            series_name = series_name[:idx] + '...'
+        else:
+            series_name = series_name[:max_length-3] + '...'
 
-    idx = text.rfind(' ', 0, max_length)
-    return text[:idx] if idx != -1 else text[:max_length-3] + '...'
+    # Return the truncated series name with the volume and part information and extension
+    return series_name + base_name[volume_index:].replace('_', ' ') + extension
 
 def run_jncep_command(command, success_message, error_message):
     """
@@ -128,25 +147,25 @@ os.makedirs(downloads_dir, exist_ok=True)
 
 @app.route('/')
 def index():
-    query = request.args.get('search', '')
-    search_query = query.lower().replace(' ', '_')  # Use underscores internally for matching filenames
+    query = request.args.get('search', '').replace(' ', '_')  # Replace spaces with underscores for the search
     try:
         # List files in the downloads directory
         files = os.listdir(downloads_dir)
-        # Process files for display
-        processed_files = [
+        
+        # Process files for display and sort them by creation time, newest first
+        processed_files = sorted([
             {
-                'display_name': truncate(f.replace('_', ' ')),  # Replace underscores for display
-                'full_name': f,  # Keep the actual file name for download links
+                'display_name': truncate_series_name(os.path.splitext(f)[0]),  # Apply truncation to the series name
+                'full_name': f,  # Full filename for download link
                 'timestamp': os.path.getctime(os.path.join(downloads_dir, f))  # File creation time as Unix timestamp
             }
-            for f in files if search_query in f.lower()  # Use the modified search_query for matching
-        ]
+            for f in files if query.lower() in f.lower().replace('_', ' ')  # Search functionality
+        ], key=lambda x: x['timestamp'], reverse=True)  # Sort files by timestamp, newest first
     except OSError as e:
         return f"Error accessing the downloads directory: {e}", 500
 
-    # Render the template with the list of files and the original search query
-    return render_template('index.html', files=processed_files, query=query)
+    # Render the template with the list of files and the current search query
+    return render_template('index.html', files=processed_files, query=query.replace('_', ' '))  # Display query with spaces
 
 @app.route('/download/<path:filename>')
 def download(filename):
