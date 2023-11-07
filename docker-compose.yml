@@ -15,14 +15,15 @@ services:
       # Optionally, uncomment the next line if you have a Discord webhook URL, dont wrap quotes around it.
       # - DISCORD_WEBHOOK_URL=
 
-  cron-service: # this automates the syncing of tracked series
-    image: willfarrell/crontab
-    depends_on:
-      - jncep-service
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+  cron:
+    image: alpine:latest
     environment:
-      - DOCKER_LABELS=TRUE
-    labels:
-      - cron.sync_job.schedule=0,20,40 * * * * # by default this runs every 20 minutes on the hour, to change this you just have to search a cron calculator
-      - cron.sync_job.command=curl -s http://jncep-service:5000/sync
+      - CRON_FREQUENCY=*/20 * * * * # Every 20 minutes
+      # You can change the above line to "0 * * * *" for every hour
+      # or "*/30 * * * *" for every 30 minutes, etc.
+    entrypoint: /bin/sh -c
+    command: |
+      apk add --no-cache curl &&
+      (echo "$CRON_FREQUENCY /usr/bin/curl -s http://jncep-service:5000/sync" > /etc/crontabs/root) &&
+      crond -l 2 -f &&
+      tail -f /dev/null
