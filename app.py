@@ -147,7 +147,7 @@ os.makedirs(downloads_dir, exist_ok=True)
 
 @app.route('/')
 def index():
-    query = request.args.get('search', '').replace(' ', '_')  # Replace spaces with underscores for the search
+    query = request.args.get('search', '').lower()  # Keep spaces as is and convert to lowercase
     try:
         # List files in the downloads directory
         files = os.listdir(downloads_dir)
@@ -159,13 +159,13 @@ def index():
                 'full_name': f,  # Full filename for download link
                 'timestamp': os.path.getctime(os.path.join(downloads_dir, f))  # File creation time as Unix timestamp
             }
-            for f in files if query.lower() in f.lower().replace('_', ' ')  # Search functionality
+            for f in files if query in f.lower().replace('_', ' ')  # Search functionality without replacing spaces with underscores
         ], key=lambda x: x['timestamp'], reverse=True)  # Sort files by timestamp, newest first
     except OSError as e:
         return f"Error accessing the downloads directory: {e}", 500
 
     # Render the template with the list of files and the current search query
-    return render_template('index.html', files=processed_files, query=query.replace('_', ' '))  # Display query with spaces
+    return render_template('index.html', files=processed_files, query=query)  # Display query with spaces
 
 @app.route('/download/<path:filename>')
 def download(filename):
