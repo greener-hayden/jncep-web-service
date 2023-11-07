@@ -37,7 +37,7 @@ def send_discord_notification(title, description):
             response.raise_for_status()
         except requests.RequestException as e:
             print(f"Discord notification failed: {e}")
-            
+
 def truncate(text, max_length=64):
     """
     Truncates the provided text to the specified max_length at the nearest
@@ -155,7 +155,7 @@ def index():
         # Process files for display and sort them by creation time, newest first
         processed_files = sorted([
             {
-                'display_name': truncate_series_name(os.path.splitext(f)[0]),  # Apply truncation to the series name
+                'display_name': truncate(os.path.splitext(f)[0]),  # Apply truncation to the series name
                 'full_name': f,  # Full filename for download link
                 'timestamp': os.path.getctime(os.path.join(downloads_dir, f))  # File creation time as Unix timestamp
             }
