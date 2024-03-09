@@ -7,6 +7,7 @@ import sys
 from datetime import datetime
 import time
 
+
 app = Flask(__name__)
 
 def check_environment_variables():
