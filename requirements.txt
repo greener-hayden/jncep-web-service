@@ -12,4 +12,4 @@ importlib_resources==5.4.0
 Flask==3.0.0
 gunicorn==21.2.0
 jncep==46
-requests==2.31.0
+requests==2.32.2
