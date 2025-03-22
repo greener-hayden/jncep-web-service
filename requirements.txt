@@ -10,6 +10,6 @@ rich~=11.2.0
 outcome==1.1.0
 importlib_resources==5.4.0
 Flask==3.0.0
-gunicorn==22.0.0
+gunicorn==23.0.0
 jncep==46
 requests==2.32.2
